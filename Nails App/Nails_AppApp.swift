@@ -1,18 +1,11 @@
-//
-//  Nails_AppApp.swift
-//  Nails App
-//
-//  Created by Nguyen Nguyen on 9/4/24.
-//
-
 import SwiftUI
 import SwiftData
 
 @main
-struct Nails_AppApp: App {
+struct NailsApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Item.self,  // Include the Item model
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -26,7 +19,7 @@ struct Nails_AppApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .modelContainer(sharedModelContainer)  // Provide shared model container
         }
-        .modelContainer(sharedModelContainer)
     }
 }

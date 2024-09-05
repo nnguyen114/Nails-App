@@ -1,18 +1,18 @@
-//
-//  Item.swift
-//  Nails App
-//
-//  Created by Nguyen Nguyen on 9/4/24.
-//
-
-import Foundation
 import SwiftData
+import Foundation
 
 @Model
-final class Item {
-    var timestamp: Date
-    
-    init(timestamp: Date) {
-        self.timestamp = timestamp
+class Item: Identifiable {  // Identifiable to be used in SwiftUI lists
+    var id: UUID
+    var technicianName: String
+    var serviceName: String
+    var date: Date
+
+    // Required initializer for a class
+    init(technicianName: String, serviceName: String) {
+        self.id = UUID()  // Assign a unique UUID automatically
+        self.technicianName = technicianName
+        self.serviceName = serviceName
+        self.date = Date()  // Set current date
     }
 }

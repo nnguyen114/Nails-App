@@ -1,66 +1,90 @@
-//
-//  ContentView.swift
-//  Nails App
-//
-//  Created by Nguyen Nguyen on 9/4/24.
-//
-
 import SwiftUI
 import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Query(sort: \Item.date, order: .reverse) private var services: [Item]
+    
+    @State private var selectedTechnicianName = ""
+    @State private var serviceName = ""
+
+    // Hardcoded list of technician names
+    private let technicianNames = ["Trang", "Al", "Cindy", "Kathy"]
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+        NavigationView {
+            VStack {
+                List {
+                    ForEach(services) { service in
+                        VStack(alignment: .leading) {
+                            Text(service.technicianName)
+                                .font(.headline)
+                            Text(service.serviceName)
+                            Text("Date: \(service.date, style: .date)")
+                        }
+                        .swipeActions {
+                            Button(role: .destructive) {
+                                deleteService(service)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
                     }
                 }
-                .onDelete(perform: deleteItems)
+                
+                Divider()
+                
+                VStack {
+                    Picker("Technician Name", selection: $selectedTechnicianName) {
+                        ForEach(technicianNames, id: \.self) { name in
+                            Text(name).tag(name)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+
+                    TextField("Service Name", text: $serviceName)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    
+                    Button(action: addService) {
+                        Text("Add Service")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                }
+                .padding()
             }
-#if os(macOS)
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-#endif
             .toolbar {
-#if os(iOS)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-#endif
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
+                ToolbarItem(placement: .principal) {
+                    Text("Beverly Nails")
+                        .font(.headline)
+                        .bold()
+                        .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
-        } detail: {
-            Text("Select an item")
+            .navigationBarTitleDisplayMode(.inline)  // You can also use .large if you want a large title
         }
     }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
+    
+    private func addService() {
+        // Insert new service entry
+        let newItem = Item(technicianName: selectedTechnicianName, serviceName: serviceName)
+        modelContext.insert(newItem)
+        
+        // Clear input fields after adding the service
+        selectedTechnicianName = ""
+        serviceName = ""
     }
 
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
+    private func deleteService(_ service: Item) {
+        modelContext.delete(service)
+        
+        // Save changes to the context, if needed
+        do {
+            try modelContext.save()
+        } catch {
+            print("Failed to save context after deletion: \(error)")
         }
     }
-}
-
-#Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }
