@@ -2,19 +2,22 @@ import SwiftData
 import Foundation
 
 @Model
-class Item: Identifiable {  // Identifiable to be used in SwiftUI lists
+class Item: Identifiable {
     var id: UUID
     var technicianName: String
     var serviceName: String
+    var customerName: String
     var date: Date
+    var price: Double // Added to store the price of the service
     var isAvailable: Bool
 
-    // Required initializer for a class
-    init(technicianName: String, serviceName: String, date: Date, isAvailable: Bool) {
-        self.id = UUID()  // Assign a unique UUID automatically
+    init(technicianName: String, serviceName: String, customerName: String, price: Double, date: Date = Date(), isAvailable: Bool = true) {
+        self.id = UUID()
         self.technicianName = technicianName
         self.serviceName = serviceName
-        self.date = date  // Use the date parameter provided
-        self.isAvailable = isAvailable  // Set based on the provided value
+        self.customerName = customerName
+        self.price = price
+        self.date = date
+        self.isAvailable = isAvailable
     }
 }
